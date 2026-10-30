@@ -47,8 +47,8 @@
           <i data-lucide="sprout" class="w-5 h-5"></i>
         </div>
         <div>
-          <h1 class="font-bold text-base leading-tight text-white flex items-center gap-1.5">
-            Abonadora Pro
+          <h1 class="font-bold text-base leading-tight text-white">
+            Abonadora
           </h1>
           <!-- Selector de Fecha Interactivo en el Header -->
           <div class="flex items-center gap-1 text-xs text-slate-400">
@@ -58,15 +58,9 @@
         </div>
       </div>
       
-      <!-- Botones de Acción de Cabecera -->
+      <!-- Botón de Reiniciar Jornada (Flecha de reseteo) -->
       <div class="flex items-center gap-2">
-        <!-- BOTÓN CARGA INICIAL DESTACADO ARRIBA DE TODO -->
-        <button id="btnTopInitialLoad" onclick="openFertilizerModal && openFertilizerModal()" class="px-3 py-1.5 rounded-xl bg-agro-600 hover:bg-agro-500 active:scale-95 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-agro-600/30 transition cursor-pointer">
-          <i data-lucide="scale" class="w-4 h-4"></i>
-          <span>Carga Inicial</span>
-        </button>
-
-        <button id="btnNewDay" title="Nueva Jornada" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs flex items-center gap-1 transition">
+        <button id="btnNewDay" title="Reiniciar Jornada / Limpiar" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs flex items-center gap-1 transition">
           <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
         </button>
       </div>
@@ -74,7 +68,56 @@
   </header>
 
   <!-- Contenedor Principal (Optimizado para pantalla de celular) -->
-  <main class="max-w-xl mx-auto px-4 pt-4 space-y-4">
+  <main class="max-w-xl mx-auto px-4 pt-3 space-y-3">
+
+    <!-- SECCIÓN DE ACCIONES Y ENTRADA RÁPIDA (Por encima de Tolva Actual) -->
+    <section class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 shadow-md space-y-2.5">
+      
+      <!-- Fila de Botones Principales de Acción -->
+      <div class="grid grid-cols-3 gap-2">
+        <!-- 1. Botón Primer Carga -->
+        <button id="btnTopInitialLoad" onclick="openFertilizerModal && openFertilizerModal()" class="bg-agro-600 hover:bg-agro-500 active:scale-95 text-white p-2.5 rounded-xl font-bold text-xs flex flex-col items-center justify-center gap-1 shadow-md shadow-agro-600/20 transition cursor-pointer">
+          <i data-lucide="scale" class="w-4 h-4"></i>
+          <span class="truncate">Primer carga</span>
+        </button>
+
+        <!-- 2. Botón Cerrar Campo -->
+        <button id="btnOpenFieldModal" class="bg-slate-800 hover:bg-slate-750 active:scale-95 border border-slate-700 hover:border-agro-500/50 text-white p-2.5 rounded-xl font-bold text-xs flex flex-col items-center justify-center gap-1 transition shadow-sm">
+          <i data-lucide="map-pin" class="w-4 h-4 text-amber-400"></i>
+          <span class="truncate">Cerrar Campo</span>
+        </button>
+
+        <!-- 3. Botón Recargar Tolva -->
+        <button id="btnOpenRefillModal" class="bg-slate-800 hover:bg-slate-750 active:scale-95 border border-slate-700 hover:border-blue-500/50 text-white p-2.5 rounded-xl font-bold text-xs flex flex-col items-center justify-center gap-1 transition shadow-sm">
+          <i data-lucide="plus-circle" class="w-4 h-4 text-blue-400"></i>
+          <span class="truncate">Recargar Tolva</span>
+        </button>
+      </div>
+
+      <!-- Fila de Entrada: Micrófono compacto + Cuadro de texto/dictado directo -->
+      <form id="formDirectVoice" class="flex items-center gap-1.5 pt-0.5">
+        <!-- Botón de Micrófono compacto -->
+        <button type="button" id="btnVoiceRecord" class="relative group p-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 active:scale-95 text-agro-400 border border-slate-700 hover:border-agro-500/60 transition shrink-0 shadow-sm" title="Tocar para dictar">
+          <span id="voicePulseRing" class="hidden absolute inset-0 rounded-xl bg-red-500 animate-ping opacity-60"></span>
+          <i id="voiceMicIcon" data-lucide="mic" class="w-4 h-4 relative z-10"></i>
+        </button>
+
+        <!-- Cuadro de texto para escribir o dictar con el teclado del celular -->
+        <input type="text" id="inputDirectVoiceText" placeholder="Escribe o dicta todo aquí..." class="flex-1 bg-slate-950 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-agro-500 placeholder:text-slate-500">
+
+        <!-- Botón Procesar -->
+        <button type="submit" id="btnProcessDirectText" class="px-3 py-2 bg-agro-700 hover:bg-agro-600 active:scale-95 text-white font-bold text-xs rounded-xl flex items-center gap-1 transition shrink-0 shadow-sm">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+          <span>Procesar</span>
+        </button>
+      </form>
+
+      <!-- Estado discreto de voz si se activa el micrófono -->
+      <div id="voiceStatusContainer" class="flex items-center justify-between text-[11px] px-1 text-slate-400">
+        <span id="voiceStatusText" class="truncate">Usa el micrófono o el cuadro para ingresar datos</span>
+        <span id="voiceLiveTranscript" class="text-agro-300 italic truncate max-w-[200px]"></span>
+      </div>
+    </section>
 
     <!-- Tarjeta Principal: Estado de la Tolva en Tiempo Real -->
     <section class="bg-gradient-to-br from-slate-800/90 to-slate-900/90 border border-slate-700 rounded-2xl p-4 shadow-xl relative overflow-hidden">
@@ -95,7 +138,7 @@
         <div onclick="openFertilizerModal && openFertilizerModal()" class="text-right flex flex-col items-end cursor-pointer group hover:opacity-90 transition p-1 rounded-lg">
           <span class="text-xs text-slate-400 font-medium block">Fertilizante</span>
           <span id="currentFertilizerName" class="text-sm font-bold text-agro-300 group-hover:text-agro-200">Sin Definir</span>
-          <span class="text-[11px] text-slate-400 mt-0.5">Carga Inicial: <strong id="currentInitialLoadDisplay" class="text-white">0</strong> kg</span>
+          <span class="text-[11px] text-slate-400 mt-0.5">Primer carga: <strong id="currentInitialLoadDisplay" class="text-white">0</strong> kg</span>
         </div>
       </div>
 
@@ -118,88 +161,6 @@
         </div>
       </div>
     </section>
-
-    <!-- Botón Gigante de Audio / Micrófono Inteligente -->
-    <section class="bg-gradient-to-r from-agro-900/40 via-agro-800/20 to-slate-800/40 border border-agro-500/30 rounded-2xl p-4 shadow-lg text-center relative">
-      <div class="flex items-center justify-between mb-3 text-left">
-        <div>
-          <h2 class="text-sm font-bold text-white flex items-center gap-2">
-            <i data-lucide="mic" class="w-4 h-4 text-agro-400"></i>
-            Dictar por Voz con IA
-          </h2>
-          <p class="text-xs text-slate-400 mt-0.5">Toca el botón y di lo que hiciste en lenguaje natural</p>
-        </div>
-        <span class="text-[10px] px-2 py-0.5 bg-agro-500/20 text-agro-300 rounded-full font-mono border border-agro-500/30">Voz Activa</span>
-      </div>
-
-      <!-- Botón central grande con animación de ondas cuando graba -->
-      <div class="flex flex-col items-center justify-center py-2">
-        <button id="btnVoiceRecord" class="relative group w-20 h-20 rounded-full bg-agro-600 hover:bg-agro-500 active:scale-95 text-white flex items-center justify-center shadow-lg shadow-agro-600/40 transition-all duration-200">
-          <!-- Anillo de pulso -->
-          <span id="voicePulseRing" class="hidden absolute inset-0 rounded-full bg-agro-500 animate-ping opacity-60"></span>
-          <i id="voiceMicIcon" data-lucide="mic" class="w-9 h-9 relative z-10 transition-transform group-hover:scale-110"></i>
-        </button>
-        <span id="voiceStatusText" class="text-xs font-semibold text-slate-300 mt-2.5">Tocar para empezar a hablar</span>
-        <p id="voiceLiveTranscript" class="text-[11px] text-agro-300 italic min-h-[16px] mt-1 max-w-sm px-2 truncate"></p>
-      </div>
-
-      <!-- Entrada de Texto / Dictado Alternativo Directo -->
-      <div class="mt-2 pt-2 border-t border-slate-700/40">
-        <form id="formDirectVoice" class="flex gap-2">
-          <input type="text" id="inputDirectVoiceText" placeholder="O escribe / dicta con el teclado aquí..." class="flex-1 bg-slate-900/90 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-agro-500 placeholder:text-slate-500">
-          <button type="submit" id="btnProcessDirectText" class="px-3.5 py-2 bg-agro-700 hover:bg-agro-600 active:scale-95 text-white font-bold text-xs rounded-xl flex items-center gap-1 transition shrink-0 shadow-md">
-            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-            <span>Procesar</span>
-          </button>
-        </form>
-      </div>
-
-      <!-- Ejemplos sugeridos para guiar al usuario -->
-      <div class="mt-3 pt-2 border-t border-slate-700/40 text-left">
-        <span class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Ejemplos de cómo hablarle:</span>
-        <div class="space-y-1">
-          <button class="voice-example-btn w-full text-left text-xs bg-slate-800/70 hover:bg-slate-700/70 text-slate-300 hover:text-white px-2.5 py-1.5 rounded-lg border border-slate-700/60 truncate transition flex items-center gap-1.5">
-            <i data-lucide="play" class="w-3 h-3 text-agro-400 shrink-0"></i>
-            <span>"Terminé campo 31 fajas 10 y 11, a 120 de dosis me quedan 300 kg"</span>
-          </button>
-          <button class="voice-example-btn w-full text-left text-xs bg-slate-800/70 hover:bg-slate-700/70 text-slate-300 hover:text-white px-2.5 py-1.5 rounded-lg border border-slate-700/60 truncate transition flex items-center gap-1.5">
-            <i data-lucide="play" class="w-3 h-3 text-agro-400 shrink-0"></i>
-            <span>"Listo lote 5, fueron 20 hectáreas y me quedan 500 kilos"</span>
-          </button>
-          <button class="voice-example-btn w-full text-left text-xs bg-slate-800/70 hover:bg-slate-700/70 text-slate-300 hover:text-white px-2.5 py-1.5 rounded-lg border border-slate-700/60 truncate transition flex items-center gap-1.5">
-            <i data-lucide="play" class="w-3 h-3 text-agro-400 shrink-0"></i>
-            <span>"Recargué 2000 kilos de fertilizante"</span>
-          </button>
-          <button class="voice-example-btn w-full text-left text-xs bg-slate-800/70 hover:bg-slate-700/70 text-slate-300 hover:text-white px-2.5 py-1.5 rounded-lg border border-slate-700/60 truncate transition flex items-center gap-1.5">
-            <i data-lucide="play" class="w-3 h-3 text-agro-400 shrink-0"></i>
-            <span>"Arranco con 3500 kilos de urea"</span>
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- Botones de Acción Rápida Manual -->
-    <div class="grid grid-cols-2 gap-3">
-      <button id="btnOpenFieldModal" class="bg-slate-800 hover:bg-slate-750 active:bg-slate-700 border border-slate-700 hover:border-agro-500/50 p-3.5 rounded-xl flex items-center gap-3 transition group shadow-md">
-        <div class="w-10 h-10 rounded-lg bg-agro-500/20 text-agro-400 flex items-center justify-center group-hover:scale-105 transition-transform">
-          <i data-lucide="map-pin" class="w-5 h-5"></i>
-        </div>
-        <div class="text-left">
-          <span class="text-sm font-bold text-white block">Cerrar Campo</span>
-          <span class="text-[11px] text-slate-400">Ingresar ha y tolva</span>
-        </div>
-      </button>
-
-      <button id="btnOpenRefillModal" class="bg-slate-800 hover:bg-slate-750 active:bg-slate-700 border border-slate-700 hover:border-blue-500/50 p-3.5 rounded-xl flex items-center gap-3 transition group shadow-md">
-        <div class="w-10 h-10 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center group-hover:scale-105 transition-transform">
-          <i data-lucide="plus-circle" class="w-5 h-5"></i>
-        </div>
-        <div class="text-left">
-          <span class="text-sm font-bold text-white block">Recargar Tolva</span>
-          <span class="text-[11px] text-slate-400">Sumar kilos</span>
-        </div>
-      </button>
-    </div>
 
     <!-- Lista Histórica / Bitácora de la Jornada -->
     <section class="space-y-2 pt-2">
@@ -481,13 +442,13 @@
     </div>
   </div>
 
-  <!-- Modal: Configuración de Fertilizante / Inicio de Día -->
+  <!-- Modal: Configuración de Fertilizante / Primer Carga -->
   <div id="modalFertilizer" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-5 shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <h3 class="font-bold text-sm text-white flex items-center gap-2">
-          <i data-lucide="settings" class="w-4 h-4 text-agro-400"></i>
-          Configurar Fertilizante y Carga Inicial
+          <i data-lucide="scale" class="w-4 h-4 text-agro-400"></i>
+          Configurar Fertilizante y Primer Carga
         </h3>
         <button id="btnCloseFertilizerModal" class="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">
           <i data-lucide="x" class="w-5 h-5"></i>
@@ -501,9 +462,9 @@
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Carga Inicial de Tolva (kg)</label>
-          <input type="number" step="1" id="inputInitialLoadKg" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-agro-500" placeholder="Ej: 3500">
-          <p class="text-[10px] text-slate-400 mt-1">Con cuántos kg arrancaste la primera vez.</p>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Primer Carga de Tolva (kg) *</label>
+          <input type="number" step="1" id="inputInitialLoadKg" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-agro-500 font-bold" placeholder="Ej: 3500">
+          <p class="text-[10px] text-slate-400 mt-1">Con cuántos kg arrancaste al inicio de la jornada.</p>
         </div>
 
         <div class="flex gap-2 pt-2">

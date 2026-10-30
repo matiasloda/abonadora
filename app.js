@@ -236,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (ev.type === 'init') {
       iconHtml = '<i data-lucide="play-circle" class="w-4 h-4 text-agro-400"></i>';
-      badgeHtml = '<span class="text-[10px] px-2 py-0.5 rounded font-bold bg-agro-500/20 text-agro-300 border border-agro-500/30">Carga Inicial</span>';
+      badgeHtml = '<span class="text-[10px] px-2 py-0.5 rounded font-bold bg-agro-500/20 text-agro-300 border border-agro-500/30">Primer Carga</span>';
       contentHtml = `
         <div class="mt-2 text-xs text-slate-300 flex justify-between items-center">
           <div>
@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <strong class="text-white text-sm">${state.fertilizerName}</strong>
           </div>
           <div class="text-right">
-            <span class="text-slate-400 block text-[11px]">Carga:</span>
+            <span class="text-slate-400 block text-[11px]">Primer Carga:</span>
             <strong class="text-white text-sm">${ev.refillKg.toLocaleString('es-ES')} kg</strong>
           </div>
         </div>
@@ -926,7 +926,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const formattedDate = formatDisplayDate(state.date) || new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     doc.text(`Fecha: ${formattedDate}`, 18, 33);
     doc.text(`Fertilizante: ${state.fertilizerName || 'No especificado'}`, 18, 40);
-    doc.text(`Carga Inicial: ${(state.initialLoadKg || 0).toLocaleString('es-ES')} kg`, 18, 46);
+    doc.text(`Primer Carga: ${(state.initialLoadKg || 0).toLocaleString('es-ES')} kg`, 18, 46);
 
     // Métricas en la caja derecha
     let totalHa = 0;
@@ -952,7 +952,7 @@ document.addEventListener('DOMContentLoaded', () => {
     state.events.forEach((ev) => {
       if (ev.type === 'init') {
         tableRows.push([
-          'INICIO DE JORNADA - CARGA INICIAL',
+          'INICIO DE JORNADA - PRIMER CARGA',
           '-',
           '-',
           '-',
@@ -1072,7 +1072,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     state.events.forEach((ev) => {
       if (ev.type === 'init') {
-        fieldsText += `🚀 *Carga Inicial:* ${ev.refillKg.toLocaleString('es-ES')} kg (${state.fertilizerName})\n`;
+        fieldsText += `🚀 *Primer Carga:* ${ev.refillKg.toLocaleString('es-ES')} kg (${state.fertilizerName})\n`;
       } else if (ev.type === 'refill') {
         fieldsText += `➕ *Recarga:* +${ev.refillKg.toLocaleString('es-ES')} kg ${ev.note ? `(${ev.note})` : ''} ➜ Tolva: ${ev.newTolvaKg.toLocaleString('es-ES')} kg\n`;
       } else if (ev.type === 'field') {
@@ -1089,7 +1089,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const message = 
 `📋 *REPORTE DE ABONADORA - ${dateHeaderFormatted}*
 🌱 *Fertilizante:* ${state.fertilizerName}
-⚖️ *Carga Inicial:* ${(state.initialLoadKg || 0).toLocaleString('es-ES')} kg
+⚖️ *Primer Carga:* ${(state.initialLoadKg || 0).toLocaleString('es-ES')} kg
 
 *DETALLE DE CAMPOS Y RECARGAS:*
 ${fieldsText || 'Sin eventos registrados'}
