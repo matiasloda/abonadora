@@ -140,6 +140,18 @@
           <i id="voiceMicIcon" data-lucide="mic" class="w-9 h-9 relative z-10 transition-transform group-hover:scale-110"></i>
         </button>
         <span id="voiceStatusText" class="text-xs font-semibold text-slate-300 mt-2.5">Tocar para empezar a hablar</span>
+        <p id="voiceLiveTranscript" class="text-[11px] text-agro-300 italic min-h-[16px] mt-1 max-w-sm px-2 truncate"></p>
+      </div>
+
+      <!-- Entrada de Texto / Dictado Alternativo Directo -->
+      <div class="mt-2 pt-2 border-t border-slate-700/40">
+        <form id="formDirectVoice" class="flex gap-2">
+          <input type="text" id="inputDirectVoiceText" placeholder="O escribe / dicta con el teclado aquí..." class="flex-1 bg-slate-900/90 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-agro-500 placeholder:text-slate-500">
+          <button type="submit" id="btnProcessDirectText" class="px-3.5 py-2 bg-agro-700 hover:bg-agro-600 active:scale-95 text-white font-bold text-xs rounded-xl flex items-center gap-1 transition shrink-0 shadow-md">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+            <span>Procesar</span>
+          </button>
+        </form>
       </div>
 
       <!-- Ejemplos sugeridos para guiar al usuario -->
