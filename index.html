@@ -75,22 +75,22 @@
       
       <!-- Fila de Botones Principales de Acción -->
       <div class="grid grid-cols-3 gap-2">
-        <!-- 1. Botón Primer Carga -->
+        <!-- 1. Botón Primer Carga (Izquierda) -->
         <button id="btnTopInitialLoad" onclick="openFertilizerModal && openFertilizerModal()" class="bg-agro-600 hover:bg-agro-500 active:scale-95 text-white p-2.5 rounded-xl font-bold text-xs flex flex-col items-center justify-center gap-1 shadow-md shadow-agro-600/20 transition cursor-pointer">
           <i data-lucide="scale" class="w-4 h-4"></i>
           <span class="truncate">Primer carga</span>
         </button>
 
-        <!-- 2. Botón Cerrar Campo -->
-        <button id="btnOpenFieldModal" class="bg-slate-800 hover:bg-slate-750 active:scale-95 border border-slate-700 hover:border-agro-500/50 text-white p-2.5 rounded-xl font-bold text-xs flex flex-col items-center justify-center gap-1 transition shadow-sm">
-          <i data-lucide="map-pin" class="w-4 h-4 text-amber-400"></i>
-          <span class="truncate">Cerrar Campo</span>
-        </button>
-
-        <!-- 3. Botón Recargar Tolva -->
+        <!-- 2. Botón Recargar Tolva (Al Medio) -->
         <button id="btnOpenRefillModal" class="bg-slate-800 hover:bg-slate-750 active:scale-95 border border-slate-700 hover:border-blue-500/50 text-white p-2.5 rounded-xl font-bold text-xs flex flex-col items-center justify-center gap-1 transition shadow-sm">
           <i data-lucide="plus-circle" class="w-4 h-4 text-blue-400"></i>
           <span class="truncate">Recargar Tolva</span>
+        </button>
+
+        <!-- 3. Botón Cerrar Campo (A la Derecha) -->
+        <button id="btnOpenFieldModal" class="bg-slate-800 hover:bg-slate-750 active:scale-95 border border-slate-700 hover:border-agro-500/50 text-white p-2.5 rounded-xl font-bold text-xs flex flex-col items-center justify-center gap-1 transition shadow-sm">
+          <i data-lucide="map-pin" class="w-4 h-4 text-amber-400"></i>
+          <span class="truncate">Cerrar Campo</span>
         </button>
       </div>
 
