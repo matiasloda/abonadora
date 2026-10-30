@@ -7,30 +7,34 @@
 
 class AgroVoiceParser {
   constructor() {
-    this.recognition = null;
-    this.isRecording = false;
-    this.initSpeechRecognition();
-  }
-
-  initSpeechRecognition() {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SpeechRecognition) {
-      try {
-        this.recognition = new SpeechRecognition();
-        // Intentar usar el idioma del dispositivo o español rioplatense/general
-        const userLang = (navigator.language || 'es-ES').toLowerCase();
-        this.recognition.lang = userLang.startsWith('es') ? userLang : 'es-ES';
-        this.recognition.continuous = false;
-        this.recognition.interimResults = true; // Mostrar resultados mientras habla
-        this.recognition.maxAlternatives = 1;
-      } catch (e) {
-        console.warn('Error inicializando SpeechRecognition:', e);
-      }
-    }
+    this.currentRecognition = null;
   }
 
   isSpeechSupported() {
     return !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+  }
+
+  /**
+   * Crea una instancia nueva y limpia de SpeechRecognition para cada intento.
+   * Esto previene el error "aborted" o "already started" de Chrome y Safari.
+   */
+  createRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return null;
+
+    try {
+      const rec = new SpeechRecognition();
+      // Idioma compatible
+      const navLang = (navigator.language || 'es-ES').toLowerCase();
+      rec.lang = navLang.startsWith('es') ? navLang : 'es-ES';
+      rec.continuous = false;
+      rec.interimResults = true;
+      rec.maxAlternatives = 1;
+      return rec;
+    } catch (e) {
+      console.warn('Error instanciando SpeechRecognition:', e);
+      return null;
+    }
   }
 
   /**

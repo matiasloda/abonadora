@@ -327,106 +327,121 @@ document.addEventListener('DOMContentLoaded', () => {
   // RECONOCIMIENTO DE VOZ E INTELIGENCIA ARTIFICIAL
   // =========================================================================
 
+  let activeRecognition = null;
   let isListening = false;
+  let accumulatedFinalText = '';
+  let latestInterimText = '';
   const voiceLiveTranscript = document.getElementById('voiceLiveTranscript');
-  let accumulatedTranscript = '';
 
-  btnVoiceRecord.addEventListener('click', async () => {
+  btnVoiceRecord.addEventListener('click', () => {
     if (!voiceParser.isSpeechSupported()) {
-      alert('Tu navegador no soporta reconocimiento de voz nativo por botón. Puedes usar el cuadro de texto abajo para dictar directamente con el micrófono de tu teclado.');
+      alert('Tu navegador no soporta reconocimiento de voz por botón. Puedes usar el cuadro de texto abajo para dictar directamente con el micrófono de tu teclado.');
       return;
     }
 
     if (!isListening) {
-      await startVoiceListening();
+      startVoiceListening();
     } else {
       stopVoiceListening();
     }
   });
 
-  async function startVoiceListening() {
-    accumulatedTranscript = '';
-    if (voiceLiveTranscript) voiceLiveTranscript.textContent = '';
-
-    // Intentar solicitar permiso explícito si está disponible en móviles
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        stream.getTracks().forEach(track => track.stop());
-      } catch (err) {
-        console.warn('Permiso getUserMedia:', err);
-      }
+  function startVoiceListening() {
+    // Si había una sesión previa, forzar limpieza
+    if (activeRecognition) {
+      try { activeRecognition.abort(); } catch (e) {}
+      activeRecognition = null;
     }
 
-    try {
-      voiceParser.recognition.start();
+    accumulatedFinalText = '';
+    latestInterimText = '';
+    if (voiceLiveTranscript) voiceLiveTranscript.textContent = '';
+
+    // Crear instancia nueva y limpia en CADA intento (evita error "aborted" o "already started")
+    activeRecognition = voiceParser.createRecognition();
+    if (!activeRecognition) {
+      alert('No se pudo inicializar el micrófono en este navegador.');
+      return;
+    }
+
+    activeRecognition.onstart = () => {
       isListening = true;
       voicePulseRing.classList.remove('hidden');
       btnVoiceRecord.classList.add('recording-pulse');
       voiceStatusText.textContent = '🎙️ Escuchando... Di tu reporte (Toca para finalizar)';
       voiceStatusText.classList.add('text-red-400');
+    };
+
+    activeRecognition.onresult = (event) => {
+      let interim = '';
+      for (let i = event.resultIndex || 0; i < event.results.length; ++i) {
+        const item = event.results[i];
+        if (item.isFinal) {
+          accumulatedFinalText += ' ' + item[0].transcript;
+        } else {
+          interim += item[0].transcript;
+        }
+      }
+      latestInterimText = interim;
+      const currentFull = (accumulatedFinalText + ' ' + interim).trim();
+      if (voiceLiveTranscript && currentFull) {
+        voiceLiveTranscript.textContent = `"${currentFull}"`;
+      }
+    };
+
+    activeRecognition.onerror = (event) => {
+      console.warn('SpeechRecognition error:', event.error);
+      const err = event.error;
+
+      if (err === 'not-allowed' || err === 'service-not-allowed') {
+        alert('El micrófono está bloqueado en tu navegador. Toca el ícono del candado o permisos en tu navegador para permitir el micrófono, o usa el campo de texto de abajo.');
+      } else if (err === 'no-speech') {
+        voiceStatusText.textContent = 'No se escuchó voz. Toca e intenta de nuevo';
+      }
+      // Si es 'aborted', simplemente reseteamos la UI sin molestar al usuario
+      resetVoiceUI();
+    };
+
+    activeRecognition.onend = () => {
+      const fullSpoken = (accumulatedFinalText + ' ' + latestInterimText).trim();
+      resetVoiceUI();
+
+      if (fullSpoken.length > 0) {
+        if (voiceLiveTranscript) voiceLiveTranscript.textContent = '';
+        processSpokenText(fullSpoken);
+      }
+    };
+
+    try {
+      activeRecognition.start();
     } catch (e) {
-      console.warn('Recognition start error:', e);
-      isListening = false;
+      console.warn('Error al iniciar activeRecognition:', e);
+      resetVoiceUI();
     }
   }
 
   function stopVoiceListening() {
-    try {
-      voiceParser.recognition.stop();
-    } catch (e) {}
+    if (activeRecognition) {
+      try {
+        activeRecognition.stop(); // Deja que termine y procese lo dicho en onend
+      } catch (e) {
+        resetVoiceUI();
+      }
+    } else {
+      resetVoiceUI();
+    }
+  }
+
+  function resetVoiceUI() {
     isListening = false;
+    activeRecognition = null;
     voicePulseRing.classList.add('hidden');
     btnVoiceRecord.classList.remove('recording-pulse');
     voiceStatusText.textContent = 'Tocar para empezar a hablar';
     voiceStatusText.classList.remove('text-red-400');
-
-    // Si quedó texto acumulado en la sesión de voz, procesarlo
-    if (accumulatedTranscript && accumulatedTranscript.trim().length > 0) {
-      const textToProcess = accumulatedTranscript.trim();
-      accumulatedTranscript = '';
-      if (voiceLiveTranscript) voiceLiveTranscript.textContent = '';
-      processSpokenText(textToProcess);
-    }
   }
 
-  if (voiceParser.recognition) {
-    voiceParser.recognition.onresult = (event) => {
-      let interim = '';
-      for (let i = event.resultIndex || 0; i < event.results.length; ++i) {
-        if (event.results[i].isFinal) {
-          accumulatedTranscript += ' ' + event.results[i][0].transcript;
-        } else {
-          interim += event.results[i][0].transcript;
-        }
-      }
-
-      const showText = (accumulatedTranscript + ' ' + interim).trim();
-      if (voiceLiveTranscript) {
-        voiceLiveTranscript.textContent = `"${showText}"`;
-      }
-    };
-
-    voiceParser.recognition.onerror = (event) => {
-      console.error('Error de voz:', event.error);
-      stopVoiceListening();
-      if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-        alert('El micrófono está bloqueado en tu navegador. Toca el ícono del candado o permisos en la barra de tu navegador para permitir el micrófono, o usa el campo de texto de abajo con el teclado.');
-      } else if (event.error === 'no-speech') {
-        voiceStatusText.textContent = 'No se detectó voz. Toca e intenta de nuevo';
-      } else if (event.error !== 'aborted') {
-        console.warn('SpeechRecognition error info:', event.error);
-      }
-    };
-
-    voiceParser.recognition.onend = () => {
-      if (isListening) {
-        stopVoiceListening();
-      }
-    };
-  }
-
-  // Formulario de dictado o escritura directa por teclado
+  // Formulario de dictado o escritura directa por teclado (Plan B permanente)
   const formDirectVoice = document.getElementById('formDirectVoice');
   const inputDirectVoiceText = document.getElementById('inputDirectVoiceText');
   if (formDirectVoice) {
