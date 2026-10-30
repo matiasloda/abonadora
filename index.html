@@ -352,6 +352,22 @@
     </div>
   </div>
 
+  <script>
+    // Asignar fecha de hoy inmediatamente para evitar que la web muestre el selector vacío
+    (function() {
+      try {
+        var d = new Date();
+        var y = d.getFullYear();
+        var m = String(d.getMonth() + 1).padStart(2, '0');
+        var day = String(d.getDate()).padStart(2, '0');
+        var todayStr = y + '-' + m + '-' + day;
+        var s = document.getElementById('sessionDatePicker');
+        if (s) s.value = todayStr;
+        var l = document.getElementById('logSectionDatePicker');
+        if (l) l.value = todayStr;
+      } catch (e) {}
+    })();
+  </script>
   <script src="app.js"></script>
 </body>
 </html>

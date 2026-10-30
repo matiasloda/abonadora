@@ -66,10 +66,17 @@ document.addEventListener('DOMContentLoaded', () => {
   // GESTIÓN DE ESTADO (PERSISTENCIA LOCAL)
   // =========================================================================
 
+  function getTodayLocalDate() {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   function getInitialState() {
-    const today = new Date().toISOString().split('T')[0];
     return {
-      date: today,
+      date: getTodayLocalDate(),
       fertilizerName: 'Urea',
       initialLoadKg: 0,
       currentTolvaKg: 0,
@@ -84,46 +91,61 @@ document.addEventListener('DOMContentLoaded', () => {
   function loadState() {
     try {
       const data = localStorage.getItem(STORAGE_KEY);
-      return data ? JSON.parse(data) : null;
+      if (!data) return null;
+      const parsed = JSON.parse(data);
+      const todayStr = getTodayLocalDate();
+
+      // Si no tiene fecha válida YYYY-MM-DD
+      if (!parsed.date || !/^\d{4}-\d{2}-\d{2}$/.test(parsed.date)) {
+        parsed.date = todayStr;
+      } else if ((!parsed.events || parsed.events.length === 0) && parsed.date !== todayStr) {
+        // Si la sesión no tiene eventos registrados, actualizar por defecto a la fecha de hoy
+        parsed.date = todayStr;
+      }
+      return parsed;
     } catch (e) {
       console.error('Error al cargar estado:', e);
       return null;
     }
   }
 
+  function updateDatePickersUI(dateVal) {
+    const validVal = dateVal || state.date || getTodayLocalDate();
+    if (sessionDatePicker) sessionDatePicker.value = validVal;
+    if (logSectionDatePicker) logSectionDatePicker.value = validVal;
+  }
+
   function initDatePickers() {
-    // Si no tiene fecha guardada, usar hoy
-    if (!state.date) {
-      state.date = new Date().toISOString().split('T')[0];
+    if (!state.date || !/^\d{4}-\d{2}-\d{2}$/.test(state.date)) {
+      state.date = getTodayLocalDate();
+      saveState();
     }
 
+    updateDatePickersUI(state.date);
+
     if (sessionDatePicker) {
-      sessionDatePicker.value = state.date;
-      sessionDatePicker.addEventListener('change', (e) => {
-        handleDateChange(e.target.value);
-      });
+      sessionDatePicker.addEventListener('change', (e) => handleDateChange(e.target.value));
+      sessionDatePicker.addEventListener('input', (e) => handleDateChange(e.target.value));
     }
 
     if (logSectionDatePicker) {
-      logSectionDatePicker.value = state.date;
-      logSectionDatePicker.addEventListener('change', (e) => {
-        handleDateChange(e.target.value);
-      });
+      logSectionDatePicker.addEventListener('change', (e) => handleDateChange(e.target.value));
+      logSectionDatePicker.addEventListener('input', (e) => handleDateChange(e.target.value));
     }
   }
 
   function handleDateChange(newDate) {
-    if (!newDate) return;
+    if (!newDate || !/^\d{4}-\d{2}-\d{2}$/.test(newDate)) return;
     state.date = newDate;
-    if (sessionDatePicker) sessionDatePicker.value = newDate;
-    if (logSectionDatePicker) logSectionDatePicker.value = newDate;
+    updateDatePickersUI(newDate);
     saveState();
   }
 
   function formatDisplayDate(dateStr) {
     if (!dateStr) return '';
-    const [y, m, d] = dateStr.split('-');
-    const dateObj = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+    const parts = dateStr.split('-');
+    if (parts.length !== 3) return '';
+    const dateObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
     const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
     const formatted = dateObj.toLocaleDateString('es-ES', options);
     return formatted.charAt(0).toUpperCase() + formatted.slice(1);
@@ -164,6 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // =========================================================================
 
   function renderDashboard() {
+    updateDatePickersUI(state.date);
     currentTolvaKgEl.textContent = state.currentTolvaKg.toLocaleString('es-ES');
     currentFertilizerNameEl.textContent = state.fertilizerName || 'Sin Definir';
     if (currentInitialLoadDisplay) {
@@ -552,6 +575,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (confirm('¿Deseas iniciar una NUEVA JORNADA? Se reiniciarán los registros del día. Asegúrate de haber descargado el PDF si lo necesitas.')) {
       state = getInitialState();
       saveState();
+      updateDatePickersUI(state.date);
       renderDashboard();
       renderLog();
       openFertilizerModal();
